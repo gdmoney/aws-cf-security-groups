@@ -1,0 +1,239 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create and export 3 security groups.
+
+Parameters:
+  SG1NAME:
+    Type: String
+    Default: Intra-VPC
+  SG2NAME:
+    Type: String
+    Default: Internet-to-Web
+  SG3NAME:
+    Type: String
+    Default: R53-and-GA-Health-Checkers
+  VPCID:
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-0edf54773482a9929
+
+Resources:
+  SG1:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId: !Ref VPCID
+      GroupName: !Ref SG1NAME
+      GroupDescription: Allow intra-VPC traffic
+      Tags:
+        - Key: Name
+          Value: !Ref SG1NAME
+  SG1IN1:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG1
+      IpProtocol: '-1'
+      CidrIp: 10.0.0.0/21
+      Description: 'VPC - local'
+  SG1OUT1:
+    Type: 'AWS::EC2::SecurityGroupEgress'
+    Properties:
+      GroupId: !Ref SG1
+      IpProtocol: '-1'
+      CidrIp: 0.0.0.0/0
+
+  SG2:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId: !Ref VPCID
+      GroupName: !Ref SG2NAME
+      GroupDescription: Allow Internet to Web tier traffic
+      Tags:
+        - Key: Name
+          Value: !Ref SG2NAME
+  SG2IN1:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG2
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: 65.204.229.0/24
+      Description: 'Intuit SDG'
+  SG2IN2:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG2
+      IpProtocol: tcp
+      FromPort: '443'
+      ToPort: '443'
+      CidrIp: 65.204.229.0/24
+      Description: 'Intuit SDG'
+  SG2IN3:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG2
+      IpProtocol: tcp
+      FromPort: '22'
+      ToPort: '22'
+      CidrIp: 65.204.229.0/24
+      Description: 'Intuit SDG'
+  SG2OUT1:
+    Type: 'AWS::EC2::SecurityGroupEgress'
+    Properties:
+      GroupId: !Ref SG2
+      IpProtocol: '-1'
+      CidrIp: 0.0.0.0/0
+
+  SG3:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId: !Ref VPCID
+      GroupName: !Ref SG3NAME
+      GroupDescription: Allow Route53 and GA Health Checker traffic to the web tier
+      Tags:
+        - Key: Name
+          Value: !Ref SG3NAME  
+  SG3IN1:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: 54.243.31.0/24
+      Description: 'Route 53 health checker'
+  SG3IN2:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: 107.23.255.0/24
+      Description: 'Route 53 health checker'
+  SG3IN3:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: 54.241.32.0/24
+      Description: 'Route 53 health checker'
+  SG3IN4:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: 54.183.255.0/24
+      Description: 'Route 53 health checker'
+  SG3IN5:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: 54.245.168.0/24
+      Description: 'Route 53 health checker'
+  SG3IN6:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: 54.244.52.0/24
+      Description: 'Route 53 health checker'
+  SG3IN7:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '443'
+      ToPort: '443'
+      CidrIp: 54.243.31.0/24
+      Description: 'Route 53 health checker'
+  SG3IN8:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '443'
+      ToPort: '443'
+      CidrIp: 107.23.255.0/24
+      Description: 'Route 53 health checker'
+  SG3IN9:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '443'
+      ToPort: '443'
+      CidrIp: 54.241.32.0/24
+      Description: 'Route 53 health checker'
+  SG3IN10:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '443'
+      ToPort: '443'
+      CidrIp: 54.183.255.0/24
+      Description: 'Route 53 health checker'
+  SG3IN11:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '443'
+      ToPort: '443'
+      CidrIp: 54.245.168.0/24
+      Description: 'Route 53 health checker'
+  SG3IN12:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '443'
+      ToPort: '443'
+      CidrIp: 54.244.52.0/24
+      Description: 'Route 53 health checker'
+  SG3IN13:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: 99.82.0.0/16
+      Description: 'GA health checker'
+  SG3IN14:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: tcp
+      FromPort: '443'
+      ToPort: '443'
+      CidrIp: 99.82.0.0/16
+      Description: 'GA 53 health checker'
+  SG3OUT1:
+    Type: 'AWS::EC2::SecurityGroupEgress'
+    Properties:
+      GroupId: !Ref SG3
+      IpProtocol: '-1'
+      CidrIp: 0.0.0.0/0
+
+Outputs:
+  SG1EXPORT:
+    Value: !Ref SG1
+    Export:
+      Name: !Sub SG-${SG1NAME}
+  SG2EXPORT:
+    Value: !Ref SG2
+    Export:
+      Name: !Sub SG-${SG2NAME}
+  SG3EXPORT:
+    Value: !Ref SG3
+    Export:
+      Name: !Sub SG-${SG3NAME}
